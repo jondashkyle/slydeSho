@@ -51,6 +51,8 @@ if ( $block.is('[data-slide-delay]') ) {
 slideshow.loop = setTimeout(slideshow.progress, _delay);
 ```
 
+With this example we set the `delay` option to `false` which disables the built-in loop interval when calling `.start()`.
+
 ## Events
 
 Events can be set like so:
@@ -60,11 +62,9 @@ slides.once('progress', callback);
 slides.off('progress', callback);
 ```
 
-Event | Description
--------------  | -------------
-block:on  | Block is activated
-block:off  | Block is deactivated
-progress | Slideshow has progressed
+- **block:on** Block is activated
+- **block:off** Block is deactivated
+- **progress** Slideshow has progressed
 
 ## Methods
 
@@ -73,7 +73,5 @@ Methods can be invoked like so:
 slides.start();
 ```
 
-Method | Description
--------------  | -------------
-start  | Start the slideshow
-stop  | Stop the slideshow
+- **start** Start the slideshow
+- **stop** Stop the slideshow
