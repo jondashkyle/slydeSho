@@ -170,9 +170,9 @@ module.exports = function(opts) {
       transport.loopStop();
 
       // Unbind events
-      events.off('start', helpers.blockActiveOn);
-      events.off('progress', helpers.blockActiveOn);
-      events.off('progress', helpers.blockLastOff);
+      events.removeListener('start', helpers.blockActiveOn);
+      events.removeListener('progress', helpers.blockActiveOn);
+      events.removeListener('progress', helpers.blockLastOff);
       events.emit('stop');
 
     },
@@ -183,6 +183,7 @@ module.exports = function(opts) {
 
     loopStop : function() {
       clearInterval(loop);
+      clearTimeout(loop);
     }
 
   };

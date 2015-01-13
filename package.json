@@ -1,6 +1,6 @@
 {
   "name": "slydesho",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Little slideshow manager",
   "main": "index.js",
   "scripts": {
