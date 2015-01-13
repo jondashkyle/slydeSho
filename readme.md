@@ -1,4 +1,4 @@
-# Slydesho
+# slydeSho
 
 `npm install slydesho`
 
@@ -31,15 +31,15 @@ slides.on('block:off', function(data) {
 slides.start();
 ```
 
-Slydesho provides some useful events to build 
+slydeSho provides some useful events to build 
 
 ## Events
 
-Events can be set to like so:
+Events can be set like so:
 ```
 slides.on('progress', callback);
 slides.once('progress', callback);
-slides.off('progress', 'callback;')
+slides.off('progress', 'callback');
 ```
 
 Event | Description
@@ -51,7 +51,9 @@ progress | Slideshow has progressed
 ## Methods
 
 Methods can be invoked like so:
-`slides.start();`
+```
+slides.start();
+```
 
 Method | Description
 -------------  | -------------
