@@ -62,9 +62,12 @@ slides.once('progress', callback);
 slides.off('progress', callback);
 ```
 
-- **block:on** Block is activated
-- **block:off** Block is deactivated
-- **progress** Slideshow has progressed
+Available events:
+```
+block:on        Block is activated
+block:off       Block is deactivated
+progress        Slideshow has progressed
+```
 
 ## Methods
 
@@ -73,5 +76,8 @@ Methods can be invoked like so:
 slides.start();
 ```
 
-- **start** Start the slideshow
-- **stop** Stop the slideshow
+Available methods:
+```
+start           Start the slideshow
+stop            Stop the slideshow
+```
