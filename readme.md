@@ -15,7 +15,7 @@ var slides = Slydesho({
 });
 ```
 
-Require Slydesho. Create a new instance and pass an array of elements you want to keep track of in the options. This example is using jQuery to create that array.
+Require Slydesho. Create a new instance and pass an array of elements you want to keep track of in the options. This example is using jQuery to create that array. In the documentation below we'll be referring to `slides` as the namespace, but you can call this anything you like.
 
 ## Example slideshow
 
@@ -38,17 +38,21 @@ slides.start();
 It's possible to define a custom loop by using the Loop helper. I find this useful for defining custom delays based upon attributes on the block element. You could store the timeout in your own implimentation, but the method below lets you utilize the pre-baked stop and pause methods.
 
 ```
-// Data and element cache
-var $block = $(_data.block);
-var _delay = 500;
+slides.on('block:on', function() {
 
-// Custom delay
-if ( $block.is('[data-slide-delay]') ) {
-    _delay = parseInt($block.attr('data-slide-delay'));
-}
+    // Data and element cache
+    var $block = $(_data.block);
+    var _delay = 500;
 
-// Progress
-slideshow.loop = setTimeout(slideshow.progress, _delay);
+    // Custom delay
+    if ( $block.is('[data-slide-delay]') ) {
+        _delay = parseInt($block.attr('data-slide-delay'));
+    }
+
+    // Progress
+    slideshow.loop = setTimeout(slideshow.progress, _delay);
+
+});
 ```
 
 With this example we set the `delay` option to `false` which disables the built-in loop interval when calling `.start()`.
