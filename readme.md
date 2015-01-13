@@ -19,6 +19,8 @@ Require Slydesho. Create a new instance and pass an array of elements you want t
 
 ## Example slideshow
 
+Here’s a quick demonstration of how to build a rudimentary slideshow using the `block:on` and `block:off` events. The data associated with the block is passed through the first argument of the function.
+
 ```
 slides.on('block:on', function(data) {
 	$(data.block).css('display', 'block');
@@ -30,8 +32,6 @@ slides.on('block:off', function(data) {
 
 slides.start();
 ```
-
-slydeSho provides some useful events to build 
 
 ## Custom loops
 
@@ -57,7 +57,7 @@ Events can be set like so:
 ```
 slides.on('progress', callback);
 slides.once('progress', callback);
-slides.off('progress', 'callback');
+slides.off('progress', callback);
 ```
 
 Event | Description
