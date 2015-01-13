@@ -10,6 +10,14 @@ var extend       = require('extend');
 module.exports = function(opts) {
 
   /**
+   * Events
+   */
+  var events = new EventEmitter();
+  var on     = function(ev, cb) { events.on(ev, cb) };
+  var once   = function(ev, cb) { events.once(ev, cb) }
+  var off    = function(ev, cb) { events.removeListener(ev, cb) };
+
+  /**
    * Options
    */
   var options = extend(true, {
@@ -46,18 +54,15 @@ module.exports = function(opts) {
    */
   var progress = function(_direction) {
 
-    // Data
-    var _block = 0;
-
     // Update the position
     data.positionLast   = data.positionActive;
     data.positionActive = data.positionActive % options.blocks.length;
 
     // Direction we should progress
     if ( _direction === 'prev' ) {
-      _block = options.blocks[data.positionActive--];
+      data.positionActive--;
     } else {
-      _block = options.blocks[data.positionActive++];
+      data.positionActive++;
     }
 
     // Event
@@ -127,6 +132,10 @@ module.exports = function(opts) {
 
     blockLastOff : function() {
       block.off(data.positionLast);
+    },
+
+    setLoop : function(_loop) {
+      loop = _loop;
     }
 
   };
@@ -142,14 +151,12 @@ module.exports = function(opts) {
       if ( ! blocks.check() ) return;
 
       // Loop
-      if ( options.delay ) {
-        progress(0);
-        loop = setInterval(progress, options.delay);
-      }
+      if ( options.delay ) transport.loopStart();
 
       // Bind events
       events.on('progress', helpers.blockActiveOn);
       events.on('progress', helpers.blockLastOff);
+      events.on('start', helpers.blockActiveOn);
       events.emit('start');
 
     },
@@ -160,32 +167,35 @@ module.exports = function(opts) {
       if ( ! blocks.check() ) return;
 
       // Clear loop
-      clearInterval(loop);
+      transport.loopStop();
 
       // Unbind events
+      events.off('start', helpers.blockActiveOn);
       events.off('progress', helpers.blockActiveOn);
       events.off('progress', helpers.blockLastOff);
       events.emit('stop');
 
+    },
+
+    loopStart : function() {
+      loop = setInterval(progress, options.delay)
+    },
+
+    loopStop : function() {
+      clearInterval(loop);
     }
 
   };
-
-  /**
-   * Events
-   */
-  var events = new EventEmitter();
-  var on     = function(ev, cb) { events.on(ev, cb) };
-  var once   = function(ev, cb) { events.once(ev, cb) }
-  var off    = function(ev, cb) { events.removeListener(ev, cb) };
 
   /**
    * Public methods
    */
   return {
 
-    'start' : transport.start,
-    'stop'  : transport.stop,
+    'start'    : transport.start,
+    'stop'     : transport.stop,
+    'progress' : progress,
+    'loop'     : loop,
 
     'on'    : on,
     'once'  : once,

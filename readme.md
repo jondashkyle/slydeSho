@@ -33,6 +33,24 @@ slides.start();
 
 slydeSho provides some useful events to build 
 
+## Custom loops
+
+It's possible to define a custom loop by using the Loop helper. I find this useful for defining custom delays based upon attributes on the block element. You could store the timeout in your own implimentation, but the method below lets you utilize the pre-baked stop and pause methods.
+
+```
+// Data and element cache
+var $block = $(_data.block);
+var _delay = 500;
+
+// Custom delay
+if ( $block.is('[data-slide-delay]') ) {
+    _delay = parseInt($block.attr('data-slide-delay'));
+}
+
+// Progress
+slideshow.loop = setTimeout(slideshow.progress, _delay);
+```
+
 ## Events
 
 Events can be set like so:
