@@ -17,6 +17,10 @@ module.exports = function(opts) {
     // Block elements for each slide
     'blocks' : [ ],
 
+    // Default delay
+    // set to false to disable looping
+    'delay'  : 1500
+
   }, opts);
 
   /**
@@ -137,9 +141,16 @@ module.exports = function(opts) {
       // Fail check
       if ( ! blocks.check() ) return;
 
+      // Loop
+      if ( options.delay ) {
+        progress(0);
+        loop = setInterval(progress, options.delay);
+      }
+
       // Bind events
       events.on('progress', helpers.blockActiveOn);
       events.on('progress', helpers.blockLastOff);
+      events.emit('start');
 
     },
 
@@ -148,9 +159,13 @@ module.exports = function(opts) {
       // Fail check
       if ( ! blocks.check() ) return;
 
+      // Clear loop
+      clearInterval(loop);
+
       // Unbind events
       events.off('progress', helpers.blockActiveOn);
       events.off('progress', helpers.blockLastOff);
+      events.emit('stop');
 
     }
 

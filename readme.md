@@ -27,17 +27,31 @@ slides.on('block:on', function(data) {
 slides.on('block:off', function(data) {
 	$(data.block).css('display', 'none');
 });
+
+slides.start();
 ```
 
 Slydesho provides some useful events to build 
 
-## Events and Methods
+## Events
+
+Events can be set to like so:
+```
+slides.on('progress', callback);
+slides.once('progress', callback);
+slides.off('progress', 'callback;')
+```
 
 Event | Description
 -------------  | -------------
 block:on  | Block is activated
 block:off  | Block is deactivated
 progress | Slideshow has progressed
+
+## Methods
+
+Methods can be invoked like so:
+`slides.start();`
 
 Method | Description
 -------------  | -------------
