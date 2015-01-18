@@ -56,7 +56,7 @@ module.exports = function(opts) {
 
     // Update the position
     data.positionLast   = data.positionActive;
-    data.positionActive = data.positionActive % options.blocks.length;
+    data.positionActive = data.positionActive % (options.blocks.length-1);
 
     // Direction we should progress
     if ( _direction === 'prev' ) {
