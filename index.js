@@ -40,7 +40,10 @@ module.exports = function(opts) {
 
     // Positions
     'positionActive' : 0,
-    'positionLast'   : 0
+    'positionLast'   : 0,
+
+    // Status
+    'active' : false
 
   };
 
@@ -141,6 +144,10 @@ module.exports = function(opts) {
       block.off(data.positionLast);
     },
 
+    setBlocks : function(_blocks) {
+      options.blocks = _blocks;
+    },
+
     setLoop : function(_loop) {
       loop = _loop;
     },
@@ -159,13 +166,17 @@ module.exports = function(opts) {
     start : function() {
 
       // Fail check
-      if ( ! blocks.check() ) return;
+      if ( ! blocks.check() || data.active ) {
+        return;
+      }
 
       // Clear loop
       transport.loopStop();
 
       // Loop
-      if ( options.delay && options.loop ) transport.loopStart();
+      if ( options.delay && options.loop ) {
+        transport.loopStart();
+      }
 
       // Bind events
       events.on('progress', helpers.blockActiveOn);
@@ -173,9 +184,15 @@ module.exports = function(opts) {
       events.on('start', helpers.blockActiveOn);
       events.emit('start');
 
+      // Update the data
+      data.active = true;
+
     },
 
     stop : function() {
+
+      // Fail check
+      if ( ! data.active ) return;
 
       // Clear loop
       transport.loopStop();
@@ -185,6 +202,9 @@ module.exports = function(opts) {
       events.removeListener('progress', helpers.blockActiveOn);
       events.removeListener('progress', helpers.blockLastOff);
       events.emit('stop');
+
+      // Update the data
+      data.active = false;
 
     },
 
@@ -213,8 +233,9 @@ module.exports = function(opts) {
     'once'  : once,
     'off'   : off,
 
-    'setLoop'  : helpers.setLoop,
-    'setDelay' : helpers.setDelay
+    'setBlocks' : helpers.setBlocks,
+    'setLoop'   : helpers.setLoop,
+    'setDelay'  : helpers.setDelay
 
   };
 
