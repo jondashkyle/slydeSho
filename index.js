@@ -79,7 +79,7 @@ module.exports = function(opts) {
      * Make sure we have some blocks
      */
     check : function() {
-      if ( options.blocks.length > 0 ) {
+      if ( options.blocks.length > 1 ) {
         return true;
       } else {
         return false;
