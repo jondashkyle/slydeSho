@@ -26,8 +26,10 @@ module.exports = function(opts) {
     'blocks' : [ ],
 
     // Default delay
-    // set to false to disable looping
-    'delay'  : 1500
+    'delay' : 1500,
+
+    // Looping
+    'loop' : true
 
   }, opts);
 
@@ -56,13 +58,18 @@ module.exports = function(opts) {
 
     // Update the position
     data.positionLast   = data.positionActive;
-    data.positionActive = data.positionActive % (options.blocks.length-1);
+    data.positionActive = (data.positionActive % options.blocks.length);
 
     // Direction we should progress
     if ( _direction === 'prev' ) {
       data.positionActive--;
     } else {
       data.positionActive++;
+    }
+
+    // Looping
+    if ( options.loop ) {
+      transport.loopStart();
     }
 
     // Event
@@ -98,7 +105,7 @@ module.exports = function(opts) {
      * Get a block based on position within the block array
      */
     get : function(_position) {
-      return options.blocks[_position];
+      return options.blocks[_position-1];
     },
 
     /**
@@ -136,6 +143,10 @@ module.exports = function(opts) {
 
     setLoop : function(_loop) {
       loop = _loop;
+    },
+
+    setDelay : function(_delay) {
+      options.delay = _delay;
     }
 
   };
@@ -154,7 +165,7 @@ module.exports = function(opts) {
       transport.loopStop();
 
       // Loop
-      if ( options.delay ) transport.loopStart();
+      if ( options.delay && options.loop ) transport.loopStart();
 
       // Bind events
       events.on('progress', helpers.blockActiveOn);
@@ -181,11 +192,10 @@ module.exports = function(opts) {
     },
 
     loopStart : function() {
-      loop = setInterval(progress, options.delay)
+      loop = setTimeout(progress, options.delay)
     },
 
     loopStop : function() {
-      clearInterval(loop);
       clearTimeout(loop);
     }
 
@@ -203,7 +213,10 @@ module.exports = function(opts) {
 
     'on'    : on,
     'once'  : once,
-    'off'   : off
+    'off'   : off,
+
+    'setLoop'  : helpers.setLoop,
+    'setDelay' : helpers.setDelay
 
   };
 
