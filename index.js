@@ -150,6 +150,9 @@ module.exports = function(opts) {
       // Fail check
       if ( ! blocks.check() ) return;
 
+      // Clear loop
+      transport.loopStop();
+
       // Loop
       if ( options.delay ) transport.loopStart();
 
