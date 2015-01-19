@@ -177,9 +177,6 @@ module.exports = function(opts) {
 
     stop : function() {
 
-      // Fail check
-      if ( ! blocks.check() ) return;
-
       // Clear loop
       transport.loopStop();
 
@@ -192,7 +189,8 @@ module.exports = function(opts) {
     },
 
     loopStart : function() {
-      loop = setTimeout(progress, options.delay)
+      transport.loopStop();
+      loop = setTimeout(progress, options.delay);
     },
 
     loopStop : function() {
