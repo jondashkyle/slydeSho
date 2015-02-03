@@ -1,8 +1,8 @@
 /**
  * Dependencies
  */
-var EventEmitter = require('events').EventEmitter;
-var extend       = require('extend');
+var EventEmitter = require('events').EventEmitter
+var extend       = require('extend')
 
 /**
  * Exports
@@ -13,9 +13,9 @@ module.exports = function(opts) {
    * Events
    */
   var events = new EventEmitter();
-  var on     = function(ev, cb) { events.on(ev, cb) };
+  var on     = function(ev, cb) { events.on(ev, cb) }
   var once   = function(ev, cb) { events.once(ev, cb) }
-  var off    = function(ev, cb) { events.removeListener(ev, cb) };
+  var off    = function(ev, cb) { events.removeListener(ev, cb) }
 
   /**
    * Options
@@ -31,7 +31,7 @@ module.exports = function(opts) {
     // Looping
     'loop' : true
 
-  }, opts);
+  }, opts)
 
   /**
    * Data
@@ -45,12 +45,12 @@ module.exports = function(opts) {
     // Status
     'active' : false
 
-  };
+  }
 
   /**
    * Loop contains the next progress event
    */
-  var loop;
+  var loop
 
   /**
    * Progress
@@ -60,25 +60,26 @@ module.exports = function(opts) {
   var progress = function(_direction) {
 
     // Update the position
-    data.positionLast   = data.positionActive;
-    data.positionActive = (data.positionActive % options.blocks.length);
+    data.positionLast   = data.positionActive
+    data.positionActive = (data.positionActive % (options.blocks.length))
+    // data.positionActive = (data.positionActive % (options.blocks.length-1))
 
     // Direction we should progress
     if ( _direction === 'prev' ) {
-      data.positionActive--;
+      data.positionActive--
     } else {
-      data.positionActive++;
+      data.positionActive++
     }
 
     // Looping
     if ( options.loop ) {
-      transport.loopStart();
+      transport.loopStart()
     }
 
     // Event
-    events.emit('progress');
+    events.emit('progress')
 
-  };
+  }
 
   /**
    * Blocks
@@ -90,13 +91,13 @@ module.exports = function(opts) {
      */
     check : function() {
       if ( options.blocks.length > 1 ) {
-        return true;
+        return true
       } else {
-        return false;
+        return false
       }
     }
 
-  };
+  }
 
   /**
    * Block
@@ -108,7 +109,7 @@ module.exports = function(opts) {
      * Get a block based on position within the block array
      */
     get : function(_position) {
-      return options.blocks[_position-1];
+      return options.blocks[_position-1]
     },
 
     /**
@@ -116,8 +117,9 @@ module.exports = function(opts) {
      */
     on : function(_position) {
       events.emit('block:on', {
-        'block' : block.get(_position)
-      });
+        'block'    : block.get(_position),
+        'position' : _position
+      })
     },
 
     /**
@@ -125,11 +127,12 @@ module.exports = function(opts) {
      */
     off : function(_position) {
       events.emit('block:off', {
-        'block' : block.get(_position)
-      });
+        'block'    : block.get(_position),
+        'position' : _position
+      })
     }
 
-  };
+  }
 
   /**
    * Helpers
@@ -137,26 +140,26 @@ module.exports = function(opts) {
   var helpers = {
 
     blockActiveOn : function() {
-      block.on(data.positionActive);
+      block.on(data.positionActive)
     },
 
     blockLastOff : function() {
-      block.off(data.positionLast);
+      block.off(data.positionLast)
     },
 
     setBlocks : function(_blocks) {
-      options.blocks = _blocks;
+      options.blocks = _blocks
     },
 
     setLoop : function(_loop) {
-      loop = _loop;
+      loop = _loop
     },
 
     setDelay : function(_delay) {
-      options.delay = _delay;
+      options.delay = _delay
     }
 
-  };
+  }
 
   /**
    * Transport
@@ -167,62 +170,68 @@ module.exports = function(opts) {
 
       // Fail check
       if ( ! blocks.check() || data.active ) {
-        return;
+        return
       }
 
+      // Reset the position
+      data.positionActive = 0
+
       // Clear loop
-      transport.loopStop();
+      transport.loopStop()
 
       // Loop
       if ( options.delay && options.loop ) {
-        transport.loopStart();
+        transport.loopStart()
       }
 
       // Bind events
-      events.on('progress', helpers.blockActiveOn);
-      events.on('progress', helpers.blockLastOff);
-      events.on('start', helpers.blockActiveOn);
-      events.emit('start');
+      events.emit('start')
 
       // Update the data
-      data.active = true;
+      data.active = true
 
     },
 
     stop : function() {
 
       // Fail check
-      if ( ! data.active ) return;
+      if ( ! data.active ) return
 
       // Clear loop
-      transport.loopStop();
+      transport.loopStop()
 
       // Unbind events
-      events.removeListener('start', helpers.blockActiveOn);
-      events.removeListener('progress', helpers.blockActiveOn);
-      events.removeListener('progress', helpers.blockLastOff);
-      events.emit('stop');
+      events.emit('stop')
 
       // Update the data
-      data.active = false;
+      data.active = false
 
     },
 
     loopStart : function() {
-      transport.loopStop();
-      loop = setTimeout(progress, options.delay);
+      transport.loopStop()
+      loop = setTimeout(progress, options.delay)
     },
 
     loopStop : function() {
-      clearTimeout(loop);
+      clearTimeout(loop)
     }
 
   };
 
   /**
+   * Events
+   */
+  events.on('progress', helpers.blockActiveOn)
+  events.on('progress', helpers.blockLastOff)
+  events.on('start', progress)
+
+  /**
    * Public methods
    */
   return {
+
+    'blocks' : options.blocks,
 
     'start'    : transport.start,
     'stop'     : transport.stop,
@@ -237,6 +246,6 @@ module.exports = function(opts) {
     'setLoop'   : helpers.setLoop,
     'setDelay'  : helpers.setDelay
 
-  };
+  }
 
-};
+}
