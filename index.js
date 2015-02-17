@@ -28,6 +28,9 @@ module.exports = function(opts) {
     // Default delay
     'delay' : 1500,
 
+    // Direction
+    'reverse' : false,
+
     // Looping
     'loop' : true
 
@@ -40,10 +43,11 @@ module.exports = function(opts) {
 
     // Positions
     'positionActive' : 0,
-    'positionLast'   : 0,
+    'positionLast'   : -1,
 
     // Status
-    'active' : false
+    'active' : false,
+    'paused' : false
 
   }
 
@@ -59,25 +63,36 @@ module.exports = function(opts) {
    */
   var progress = function(_direction) {
 
-    // Update the position
-    data.positionLast   = data.positionActive
-    data.positionActive = (data.positionActive % (options.blocks.length))
-    // data.positionActive = (data.positionActive % (options.blocks.length-1))
+    var _position;
 
-    // Direction we should progress
-    if ( _direction === 'prev' ) {
-      data.positionActive--
+    /**
+     * Previous and next range checks
+     */
+    if ( options.reverse === true || _direction === 'prev' ) {
+      if ( data.positionActive-1 <= options.blocks.length ) {
+        _position = options.blocks.length
+      } else {
+        _position = data.positionActive-1
+      }
     } else {
-      data.positionActive++
+      if ( data.positionActive+1 >= options.blocks.length ) {
+        _position = 0
+      } else {
+        _position = data.positionActive + 1
+      }
     }
 
     // Looping
-    if ( options.loop ) {
+    if ( ! data.paused && options.loop ) {
       transport.loopStart()
     }
 
     // Event
     events.emit('progress')
+
+    // Update the data
+    data.positionLast   = data.positionActive
+    data.positionActive = _position
 
   }
 
@@ -109,7 +124,7 @@ module.exports = function(opts) {
      * Get a block based on position within the block array
      */
     get : function(_position) {
-      return options.blocks[_position-1]
+      return options.blocks[_position]
     },
 
     /**
@@ -140,11 +155,23 @@ module.exports = function(opts) {
   var helpers = {
 
     blockActiveOn : function() {
-      block.on(data.positionActive)
+      if ( data.positionLast !== data.positionActive ) {
+        block.on(data.positionActive)
+      }
     },
 
     blockLastOff : function() {
-      block.off(data.positionLast)
+      if ( data.positionLast !== data.positionActive ) {
+        block.off(data.positionLast)
+      }
+    },
+
+    setActive : function(_position) {
+      if ( _position === parseInt(_position) ) {
+        data.positionActive = _position
+      } else {
+        console.warn('Please pass an integer')
+      }
     },
 
     setBlocks : function(_blocks) {
@@ -152,11 +179,17 @@ module.exports = function(opts) {
     },
 
     setLoop : function(_loop) {
-      loop = _loop
+      if ( _loop !== 'undefined' ) {
+        loop = _loop
+      }
     },
 
     setDelay : function(_delay) {
-      options.delay = _delay
+      if ( _delay === parseInt(_delay) ) {
+        options.delay = _delay
+      } else {
+        console.warn('Please pass an integer')
+      }
     }
 
   }
@@ -173,8 +206,8 @@ module.exports = function(opts) {
         return
       }
 
-      // Reset the position
-      data.positionActive = 0
+      // Paused
+      data.paused = false
 
       // Clear loop
       transport.loopStop()
@@ -192,10 +225,27 @@ module.exports = function(opts) {
 
     },
 
+    pause : function() {
+
+      // Clear loop
+      transport.loopStop()
+
+      // Unbind events
+      events.emit('pause')
+
+      // Update the data
+      data.paused = true
+
+    },
+
+    resume : function() {
+      data.paused = false
+    },
+
     stop : function() {
 
       // Fail check
-      if ( ! data.active ) return
+      // if ( ! data.active ) return
 
       // Clear loop
       transport.loopStop()
@@ -215,6 +265,22 @@ module.exports = function(opts) {
 
     loopStop : function() {
       clearTimeout(loop)
+    },
+
+    /**
+     * Go to the next block
+     */
+    next : function() {
+      options.reverse = false
+      progress('next')
+    },
+
+    /**
+     * Go to the previous block
+     */
+    prev : function() {
+      options.reverse = true
+      progress('prev')
     }
 
   };
@@ -234,15 +300,19 @@ module.exports = function(opts) {
     'blocks' : options.blocks,
 
     'start'    : transport.start,
+    'pause'    : transport.pause,
     'stop'     : transport.stop,
-    'progress' : progress,
     'loop'     : loop,
+
+    'next' : transport.next,
+    'prev' : transport.prev,
 
     'on'    : on,
     'once'  : once,
     'off'   : off,
 
     'setBlocks' : helpers.setBlocks,
+    'setActive' : helpers.setActive,
     'setLoop'   : helpers.setLoop,
     'setDelay'  : helpers.setDelay
 
